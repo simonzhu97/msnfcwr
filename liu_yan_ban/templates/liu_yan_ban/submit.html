@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="color:white;text-align:center;">留言板 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></h1>
+
+{% if error %}
+<p style="color:#990000;text-align:center;">
+	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {{error}}
+</p>
+{% endif %}
+{% if success %}
+<p style="color:#009933;text-align:center;">
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> {{success}}
+</p>
+{% endif %}
+{% for comment in approved %}
+<p style="color:#009933;">
+	<i>{{comment.short}}</i> 已通过
+</p>
+{% endfor %}
+{% for comment in dismissed %}
+<p style="color:#990000">
+	<i>{{comment.short}}</i> 未能通过
+</p>
+{% endfor %}
+{% if approved or dismissed %}
+<p>
+<a class="btn btn-success btn-xs" href="/view/">Dismiss All</a>
+</p>
+{% endif %}
+<form action='/submit/' method="post" role="form" id="commentform">
+<div class="form-group">
+    <label for="name" style="color:#004991;">显示名</label>
+    <input type="text" class="form-control" placeholder = "Anonymous" name="name">
+</div>
+<div class="form-group">
+    <label for="content" style="color:#004991;">内容</label>
+    <textarea type="text" class="form-control" name="content" required></textarea>
+</div>
+<div class="dropdown">
+<button type="submit" class="btn btn-primary" >发送 <span class="glyphicon glyphicon-send" style="color:white;" aria-hidden="true"></span></button> 
+  <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    我要买花
+	<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="/flower/self/">自己送</a></li>
+    <li><a href="/flower/msn/">MSN代送</a></li>
+  </ul>
+
+
+</div>
+</form>
+<div style="font-size:20px;">
+<a href="/submit/" ><span class="glyphicon glyphicon-repeat" arid-hidden="true"></span>以更新留言/订单状态</a>
+</div>
+{%for t in trans%}
+<p style="color:#009933;">
+{% if not t.is_processed %}
+我们正在处理你{{t.quantity}}朵玫瑰的订单
+{% endif %}
+{% if t.is_self and t.is_processed %}
+<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>你的{{t.quantity}}朵玫瑰已经送出，请注意留意周边的MSN工作人员
+{% endif %}
+{% if not t.is_self and t.is_processed %}
+<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>你的{{t.quantity}}朵玫瑰将在下一个休息环节赠送
+{% endif %}
+{% endfor %}
+</p>
+<style type="text/css">
+	body {
+		background-color: #82c1ed;
+	}
+</style>
+{% endblock %}

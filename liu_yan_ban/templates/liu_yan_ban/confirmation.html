@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 style="color:white;text-align:center;">非诚勿扰鲜花Booth<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span></h1>
+<h3 style="color:white;text-align:center;">以下是你此次Order的详细信息</h3>
+<div style="color:white;text-align:center">
+	<p>名字: {{trans.name}}</p>
+	{% if trans.recipient %}
+	<p>送给: {{trans.recipient}}</p>
+	{% endif %}
+	{% if trans.location %}
+	<p>所坐位置: {{trans.location}}</p>
+	{% endif %}
+	{% if trans.shown_name %}
+	<p>显示名: {{trans.shown_name}}</p>
+	{% endif %}
+	{% if trans.liuyan %}
+	<p>留言: {{trans.liuyan}}</p>
+	{% endif %}
+	<p>数量: {{trans.quantity}} 朵</p>
+	<p style="font-size:20px;">总金额: ${{trans.money}}</p>
+	<p>
+	<a href="/transaction/confirm/{{trans.id}}/" class="btn btn-success">确认</a>
+	<a href="/transaction/cancel/{{trans.id}}/" class="btn btn-danger">取消</a>
+	</p>
+</div>
+<style type="text/css">
+	body {
+		background-color: #82c1ed;
+	}
+</style>
+{% endblock %}

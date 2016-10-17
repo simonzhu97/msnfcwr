@@ -1,0 +1,13 @@
+Django==1.7.5
+Pillow==2.8.1
+SQLAlchemy==1.0.4
+diff-match-patch==20121119
+dj-database-url==0.3.0
+django-import-export==0.2.7
+django-postgrespool==0.3.0
+gunicorn==19.3.0
+psycopg2==2.6
+pycrypto==2.6.1
+tablib==0.10.0
+whitenoise==1.0.6
+dj-static==0.0.6

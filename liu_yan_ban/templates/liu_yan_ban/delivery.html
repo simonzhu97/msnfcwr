@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- <meta http-equiv="refresh" content="8; http://msnfcwr.herokuapp.com//flower/"> -->
+<h1 style="color:white;text-align:center;">非诚勿扰鲜花Booth<a href='/admin/' style="color:white;"><span class="glyphicon glyphicon-leaf" arid-hidden="true"></span></a></h1>
+
+<h3 style="color:white;text-align:center;">配送</h3>
+<h4 style="text-align:center;">
+	<a href="/" style="color:white;">
+		<span class="glyphicon glyphicon-comment" arid-hidden="true"></span>
+	</a>
+	<a href="/home/" style="color:white;">
+		<span class="glyphicon glyphicon-list-alt" arid-hidden="true"></span>
+	</a>
+	<a href="/submit" style="color:white;">
+		<span class="glyphicon glyphicon-send" arid-hidden="true"></span>
+	</a>
+	<a href="/flower/" style="color:white;">
+		<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+	</a>
+</h4>
+	<h4 style="color:white;">未配送</h4>
+	<hr>
+	{% for trans in new %}
+	<p>
+	{% if trans.is_self %}
+	(观众自己送)请将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
+	{% else %}
+	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	{% endif %}
+
+	{% if trans.is_self %}
+	<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#processed-{{trans.id}}">送出</button>
+	{% else %}
+	<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#processed-{{trans.id}}">Schedule</button>
+	{% endif %}
+	<!-- 模态框（Modal） -->
+			<div class="modal fade" id="processed-{{trans.id}}" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">确认送出吗？</h4>
+							
+               <a href="/process/{{trans.id}}/" type="button" class="btn btn-sm btn-danger">确认</a>
+               <button type="button" class="btn btn-sm btn-default" 
+               data-dismiss="modal">取消</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal -->
+			</div>
+	</p>
+	{% endfor %}
+
+	<h4 style="color:white;">已送出</h4>
+	<hr>
+	{% for trans in processed %}
+	<p>
+	{% if trans.is_self %}
+	(观众自己送)请将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
+	{% else %}
+	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	{% endif %}
+
+	{% if trans.is_self %}
+	<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#delivered-{{trans.id}}">送达</button>
+	{% else %}
+	<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#delivered-{{trans.id}}">送出</button>
+	{% endif %}
+
+	<!-- 模态框（Modal） -->
+			<div class="modal fade" id="delivered-{{trans.id}}" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel">确认送达吗？</h4>
+							
+               <a href="/handle/{{trans.id}}/" type="button" class="btn btn-sm btn-danger">确认</a>
+               <button type="button" class="btn btn-sm btn-default" 
+               data-dismiss="modal">取消</button>
+						</div>
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal -->
+			</div>
+		</p>
+	{% endfor %}
+
+	<h4 style="color:white;">已配送</h4>
+	<hr>
+	{% for trans in delivered %}
+	<p style="color:grey;">
+	{% if trans.is_self %}
+	(观众自己送)已将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
+	{% else %}
+	(MSN代送)已帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	{% endif %}
+	</p>
+	{% endfor %}
+<style type="text/css">
+	body {
+		background-color: #F8ADCC;
+	}
+</style>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block icheck %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.1/icheck.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.1/skins/square/blue.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<h1 style="color:white;text-align:center;">非诚勿扰鲜花Booth<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span></h1>
+	<h3 style="color:white;text-align:center;">自己送</h3>
+{% if error %}
+<p style="color:#990000;text-align:center;">
+	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {{error}}
+</p>
+{% endif %}
+<form action='/flower/submit/self/' method="post" role="form">
+<div class="form-group">
+    <label for="name" style="color:#004991;">名字</label>
+    <input type="text" class="form-control" name="name" placeholder="你真的叫这个名字吗？" required>
+</div>
+
+<div class="form-group">
+    <label for="location" style="color:#004991;">所坐位置</label>
+    <input type="text" class="form-control" name="location" placeholder="请以左起x排y座大致指明自己的位置" required>
+</div>
+
+<div class="form-group">
+    <label for="quantity" style="color:#004991;">玫瑰朵数</label>
+    <div style="color:#004991;">
+    <!-- <label class="radio-inline"><input type="radio" name="quantity" value="0" checked>不想买<span class="glyphicon glyphicon-remove" arid-hidden="true"></span></label> -->
+      <input type="radio" name="quantity" value="1">1朵<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+      <input type="radio" name="quantity" value="3" checked>3朵<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+      <input type="radio" name="quantity" value="7">7朵<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+      <input type="radio" name="quantity" value="9">9朵<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+  </div>
+</div>
+
+<!-- <div class="form-group">
+    <label for="quantity" style="color:#004991;">巧克力盒数</label>
+    <div style="color:#004991;">
+        <label class="radio-inline"><input type="radio" name="quantity2" value="1" checked="">不想买<span class="glyphicon glyphicon-remove" arid-hidden="true"></span></label>
+      <label class="radio-inline"><input type="radio" name="quantity2" value="1">1盒<span class="glyphicon glyphicon-gift" arid-hidden="true"></span></label>
+      <label class="radio-inline"><input type="radio" name="quantity2" value="3">3盒<span class="glyphicon glyphicon-gift" arid-hidden="true"></span></label>
+      <label class="radio-inline"><input type="radio" name="quantity2" value="5">5盒<span class="glyphicon glyphicon-gift" arid-hidden="true"></span></label>
+  </div>
+</div> -->
+
+<button type="submit" class="btn btn-primary">购买 <span class="glyphicon glyphicon-piggy-bank" style="color:white;" aria-hidden="true"></span></button>
+
+</form>
+<style type="text/css">
+	body {
+		background-color: #82c1ed;
+	}
+</style>
+<script>
+$(document).ready(function(){
+  $('input').iCheck({
+    checkboxClass: 'icheckbox_square-blue',
+    radioClass: 'iradio_square-blue',
+    increaseArea: '20%' // optional
+  });
+});
+</script>
+{% endblock %}

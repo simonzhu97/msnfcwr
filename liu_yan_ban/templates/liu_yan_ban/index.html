@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<meta http-equiv="refresh" content="8; http://msnfcwr.herokuapp.com/">
+	<h1 style="color:white;text-align:center;">2015 MSN 非诚勿扰<a href='/admin/' style="color:white;"><span class="glyphicon glyphicon-heart" arid-hidden="true"></span></a></h1>
+<h3 style="color:white;text-align:center;">评论管理员</h3>
+<h4 style="text-align:center;">
+	<a href="/" style="color:white;">
+		<span class="glyphicon glyphicon-comment" arid-hidden="true"></span>
+	</a>
+	<a href="/home/" style="color:white;">
+		<span class="glyphicon glyphicon-list-alt" arid-hidden="true"></span>
+	</a>
+	<a href="/submit" style="color:white;">
+		<span class="glyphicon glyphicon-send" arid-hidden="true"></span>
+	</a>
+	<a href="/flower/" style="color:white;">
+		<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span>
+	</a>
+</h4>
+<hr>
+<div style="color:#3e2500;">
+{% for comment in comments %}
+<p>
+	{{comment.content}} -by {{comment.author}} ({{comment.user_id}})
+	<a href="/show/{{comment.id}}/" class="btn btn-xs btn-primary">Show</a>
+	<a href="/dismiss/{{comment.id}}/" class="btn btn-xs btn-danger">Dismiss</a>
+	<a href="/top/{{comment.id}}/2/" class="btn btn-xs btn-success">Top</a>
+</p>
+
+{% endfor %}
+	</div>
+<style type="text/css">
+	body {
+		background-color:#F8ADCC;
+	}
+</style>
+
+{% endblock %}

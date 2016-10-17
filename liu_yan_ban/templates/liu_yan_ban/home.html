@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<meta http-equiv="refresh" content="8; http://msnfcwr.herokuapp.com/home/">
+<h1 style="color:white;text-align:center;font-size:50px;">2015 MSN 非诚勿扰</h1>
+<div class="row">
+<div class="col-md-12" style="font-size:15px;">
+{% for comment in comments_top %}
+<p style="color:#3e2500;font-size:18px;">
+	{{comment.content}} -by {{comment.author}}
+	
+	<a href="/top/{{comment.id}}/1/" style="color:#b7386c;"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></a>
+	</p>
+{% endfor %}
+<hr>
+</div>
+
+<div class="col-md-6" style="font-size:15px;">
+{% for comment in comments_left %}
+<p style="color:#3e2500;font-size:18px;">
+	{{comment.content}} -by {{comment.author}}
+	<a href="/top/{{comment.id}}/1/" style="color:#b7386c;"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span></a>
+	</p>
+{% endfor %}
+</div>
+<div class="col-md-6" style="font-size:15px;">
+{% for comment in comments_right %}
+<p style="color:#3e2500;font-size:18px;">
+	{{comment.content}} -by {{comment.author}}
+	<a href="/top/{{comment.id}}/1/" style="color:#b7386c;"><span class="glyphicon glyphicon-heart-empty" aria-hidden="true"></span></a>
+	</p>
+{% endfor %}
+</div>
+</div>
+<style type="text/css">
+	body {
+		background-color:#F8ADCC;
+	}
+</style>
+{% endblock %}
