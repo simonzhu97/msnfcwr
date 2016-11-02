@@ -11,17 +11,19 @@ price = {0:0,1:3,3:7,7:15,9:18}
 # Create your views here.
 def index(request):
 	if request.user.is_authenticated():
-		if request.user.username == 'zeizyy':
-			comments = Comment.objects.filter(is_handled = False).order_by('-pub_date')
-			return render_to_response('liu_yan_ban/index.html',{'comments':comments})
-		else:
-			return HttpResponseRedirect(reverse('Delivery'))
-	else:
-		# if 'MicroMessenger' in request.META['HTTP_USER_AGENT']:
-		# 	return render_to_response('liu_yan_ban/weixin.html')
+		comments = Comment.objects.filter(is_handled = False).order_by('-pub_date')
+		return render_to_response('liu_yan_ban/index.html',{'comments':comments})
+		# if request.user.username == 'zeizyy':
+		# 	comments = Comment.objects.filter(is_handled = False).order_by('-pub_date')
+		# 	return render_to_response('liu_yan_ban/index.html',{'comments':comments})
 		# else:
-		# 	return HttpResponseRedirect(reverse('Submit'))
-		return render_to_response('liu_yan_ban/weixin.html')
+		# 	return HttpResponseRedirect(reverse('Delivery'))
+	else:
+		if 'MicroMessenger' in request.META['HTTP_USER_AGENT']:
+			return render_to_response('liu_yan_ban/weixin.html')
+		else:
+			return HttpResponseRedirect(reverse('Submit'))
+		# return render_to_response('liu_yan_ban/weixin.html')
 
 def home(request):
 	if request.user.is_authenticated():
