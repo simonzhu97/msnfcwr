@@ -19,7 +19,7 @@ def index(request):
 		# else:
 		# 	return HttpResponseRedirect(reverse('Delivery'))
 	else:
-		return HttpResponse(request.META['HTTP_USER_AGENT'])
+		# return HttpResponse(request.META['HTTP_USER_AGENT'])
 		if 'MicroMessenger' in request.META['HTTP_USER_AGENT']:
 			return render_to_response('liu_yan_ban/weixin.html')
 		else:
