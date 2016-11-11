@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- <meta http-equiv="refresh" content="8; http://msnfcwr.herokuapp.com//flower/"> -->
+<meta http-equiv="refresh" content="8; /flower/">
 <h1 style="color:white;text-align:center;">非诚勿扰鲜花Booth<a href='/admin/' style="color:white;"><span class="glyphicon glyphicon-leaf" arid-hidden="true"></span></a></h1>
 
 <h3 style="color:white;text-align:center;">配送</h3>
@@ -25,7 +25,7 @@
 	{% if trans.is_self %}
 	(观众自己送)请将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
 	{% else %}
-	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰</b>
 	{% endif %}
 
 	{% if trans.is_self %}
@@ -62,7 +62,7 @@
 	{% if trans.is_self %}
 	(观众自己送)请将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
 	{% else %}
-	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	(MSN代送)请帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰</b>
 	{% endif %}
 
 	{% if trans.is_self %}
@@ -100,7 +100,7 @@
 	{% if trans.is_self %}
 	(观众自己送)已将<b>{{trans.quantity}}</b>朵玫瑰送至<b>{{trans.name}}</b>@<b>{{trans.location}}</b>
 	{% else %}
-	(MSN代送)已帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰，留言为：<b>{{trans.liuyan}}</b>
+	(MSN代送)已帮<b>{{trans.shown_name}}</b>送<b>{{trans.recipient}}</b> <b>{{trans.quantity}}</b>朵玫瑰</b>
 	{% endif %}
 	</p>
 	{% endfor %}

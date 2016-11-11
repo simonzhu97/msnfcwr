@@ -7,7 +7,7 @@ from liu_yan_ban.models import Comment, UserID, Transaction
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 fei_id = 'ff_id'
-price = {0:0,1:3,3:7,7:15,9:18}
+price = {0:0,1:3,3:8,7:16,9:10}
 # Create your views here.
 def index(request):
 	if request.user.is_authenticated():
@@ -186,19 +186,18 @@ def flower_msn_submit(request):
 	if request.method != 'POST':
 		return HttpResponseRedirect(reverse('FlowerMSN'))
 	if not request.POST['name'] or \
-		not request.POST['liuyan'] or\
 		not request.POST['quantity'] or\
 		not request.POST['recipient']:
 		return render_to_response('liu_yan_ban/flower_msn.html',{'error':error})
 	shown_name = '匿名'
 	name = request.POST['name']
-	liuyan = request.POST['liuyan']
+	# liuyan = request.POST['liuyan']
 	quantity = request.POST['quantity']
 	recipient = request.POST['recipient']
 	if request.POST['shown_name']:
 		shown_name = request.POST['shown_name']
 	transaction = Transaction(name=name, shown_name=shown_name,\
-		liuyan = liuyan, quantity = quantity, recipient=recipient,\
+				quantity = quantity, recipient=recipient,\
 		is_self=False, user_id=user_id, money = price[int(quantity)])
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
