@@ -35,11 +35,11 @@ def home(request):
 		count_top = len(comments_top)
 		count = max(0,min(count_all,24)-count_top)
 		# return HttpResponse(count)
-		count = (count+1)//2
+		# count = (count+1)//2
 		comments_left = comments[:count]
-		count2 = count*2
-		comments_right = comments[count:count2]
-		return render_to_response('liu_yan_ban/home.html',{'comments_left':comments_left, 'comments_right':comments_right, 'comments_top':comments_top})
+		# count2 = count*2
+		# comments_right = comments[count:count2]
+		return render_to_response('liu_yan_ban/home.html',{'comments_left':comments_left, 'comments_top':comments_top})
 	else:
 		return HttpResponseRedirect(reverse('Submit'))
 
