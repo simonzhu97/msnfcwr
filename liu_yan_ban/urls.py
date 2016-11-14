@@ -23,5 +23,6 @@ urlpatterns = patterns('',
     url(r'^transaction/cancel/(?P<trans_id>\d+)/$', views.cancel, name='Cancel'),
     url(r'^transaction/confirm/(?P<trans_id>\d+)/$', views.confirm, name='Confirm'),
     url(r'^', views.error, name='Error'),
+    url(r'^transaction/confirm/(?P<trans_id>\d+)/$', views.confirm, name='Confirm'),
 
 )

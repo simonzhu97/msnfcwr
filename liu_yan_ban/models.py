@@ -42,4 +42,4 @@ class Transaction(models.Model):
 	is_delivered = models.BooleanField(default=False)
 
 	def __unicode__(self):
-		return self.name+" bought " + str(self.quantity) + " roses for $"+str(self.quantity*3)
+		return str(self.id) + ": " + self.name+" bought " + str(self.quantity) + " roses for $"+str(self.money)

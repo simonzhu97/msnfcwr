@@ -7,7 +7,7 @@ from liu_yan_ban.models import Comment, UserID, Transaction
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 fei_id = 'ff_id'
-price = {0:0,1:3,3:8,7:16,9:10}
+price = {0:0,1:3,3:8,7:16,9:20}
 # Create your views here.
 def index(request):
 	if request.user.is_authenticated():
@@ -260,7 +260,7 @@ def confirm(request, trans_id):
 	trans.is_confirmed = True
 	trans.save()
 	money = calc_total(trans.quantity)
-	return render_to_response('liu_yan_ban/payment.html',{'money':money})
+	return render_to_response('liu_yan_ban/payment.html',{'trans_id':trans_id, 'money':money})
 
 def error(request):
 	return HttpResponseRedirect(reverse('Submit'))
