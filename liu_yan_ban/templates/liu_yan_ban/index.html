@@ -21,10 +21,11 @@
 <div style="color:#3e2500;">
 {% for comment in comments %}
 <p>
-	{{comment.content}} -by {{comment.author}} ({{comment.user_id}})
+	{{comment.content}} -by {{comment.user}} ({{comment.user.id}})
 	<a href="/show/{{comment.id}}/" class="btn btn-xs btn-primary">Approve</a>
 	<a href="/dismiss/{{comment.id}}/" class="btn btn-xs btn-danger">Reject</a>
 	<a href="/top/{{comment.id}}/2/" class="btn btn-xs btn-success">Top</a>
+	<a href="/dm/{{comment.user.id}}/" class="btn btn-xs btn-success">DM</a>
 </p>
 
 {% endfor %}

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import render, render_to_response
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from liu_yan_ban.models import Comment, UserID, Transaction
+from liu_yan_ban.models import *
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 import random
 
@@ -35,13 +35,26 @@ def check_browser(f):
 def check_session(f):
 	def wrap(request, *args, **kwargs):
 		if fei_id not in request.session:
-			user = UserID()
-			user.save()
+			user = AUser.objects.create()
 			user_id = user.id
-			request.session[fei_id] = user_id
+			request.session[fei_id] = user.id
 		else:
 			user_id = request.session[fei_id]
-		kwargs['user_id'] = user_id
+			user = AUser.objects.get(pk=user_id)
+		kwargs['user'] = user
+		return f(request, *args, **kwargs)
+	wrap.__doc__=f.__doc__
+	wrap.__name__=f.__name__
+	return wrap
+
+def get_session_or_redirect(f):
+	def wrap(request, *args, **kwargs):
+		if fei_id not in request.session:
+			return HttpResponseRedirect('Submit')
+		else:
+			user_id = request.session[fei_id]
+			user = AUser.objects.get(pk=user_id)
+		kwargs['user'] = user
 		return f(request, *args, **kwargs)
 	wrap.__doc__=f.__doc__
 	wrap.__name__=f.__name__
@@ -86,16 +99,23 @@ def dismiss(request, comment_id):
 @check_session
 @check_browser
 def submit(request, *args, **kwargs):
-	user_id = kwargs.get('user_id')
+	user = kwargs.get('user')
 	error=''
 	success =''
-	comments_handled = Comment.objects.filter(user_id=user_id).filter(is_handled=True).filter(is_viewed=False)
+	comments_handled = Comment.objects.filter(user=user).filter(is_handled=True).filter(is_viewed=False)
 	comments_approved = list(comments_handled.filter(is_sensored=True))
 	comments_rejected = list(comments_handled.filter(is_sensored=False))
-	transaction_confirmed = Transaction.objects.filter(user_id=user_id).filter(is_confirmed=True).filter(is_delivered=False)
+	dms = list(DM.objects.filter(user=user).filter(is_viewed=False))
+	transaction_confirmed = Transaction.objects.filter(user=user).filter(is_confirmed=True).filter(is_delivered=False)
+	
 	for comment in comments_handled:
 		comment.is_viewed = True
 		comment.save()
+
+	for dm in dms:
+		dm.is_viewed = True
+		dm.save()
+
 	if request.method == "POST":
 		name = request.POST["name"]
 		content = request.POST["content"]
@@ -105,23 +125,28 @@ def submit(request, *args, **kwargs):
 			if not name:
 				comment = Comment(content=content)
 			else:
-				comment = Comment(author=name, content=content)
-			comment.user_id = user_id
+				user.name = name
+				user.save()
+				comment = Comment(user=user, content=content)
+			comment.user = user
 			try:
 				comment.save()
 			except:
 				return HttpResponseRedirect(reverse('Submit'))
 			if request.user.is_authenticated():
-				comment.author = '管理员'
+				user.name = "管理员"
+				user.save()
+				comment.user = user
 				comment.save()
 				return HttpResponseRedirect(reverse('Show',args=[comment.id]))
 			return HttpResponseRedirect(reverse('Success'))
 	return render_to_response('liu_yan_ban/submit.html',{
 		'comments_approved': comments_approved, \
 		'comments_rejected' :comments_rejected, \
+		'dms': dms, \
 		'error':error, \
 		'success':success, \
-		'user_id':user_id,
+		'user': user, \
 		'trans':transaction_confirmed})
 
 @check_browser
@@ -143,8 +168,8 @@ def top(request, comment_id, option):
 def view(request):
 	if fei_id not in request.session:
 		return HttpResponseRedirect(reverse('Submit'))
-	user_id = request.session[fei_id]
-	comments_handled = Comment.objects.filter(user_id=user_id).filter(is_handled=True).filter(is_viewed=False)
+	user = request.session[fei_id]
+	comments_handled = Comment.objects.filter(user=user).filter(is_handled=True).filter(is_viewed=False)
 	for comment in comments_handled:
 		comment.is_viewed = True
 		comment.save()
@@ -203,13 +228,12 @@ def flower_msn_submit(request, *args, **kwargs):
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
 
+@get_session_or_redirect
 @check_browser
-def confirmation(request, trans_id):
-	if fei_id not in request.session:
-		return HttpResponseRedirect(reverse('Submit'))
-	user_id = request.session[fei_id]
+def confirmation(request, trans_id, *args, **kwargs):
+	user = kwargs.get('user')
 	trans = Transaction.objects.get(pk=trans_id)
-	if user_id != trans.user_id:
+	if user.id != trans.user.id:
 		return HttpResponseRedirect(reverse('Submit'))
 	return render_to_response('liu_yan_ban/confirmation.html',{'trans':trans})
 
@@ -238,29 +262,51 @@ def handle(request, trans_id):
 	trans.save()
 	return HttpResponseRedirect(reverse('Delivery'))
 
+@get_session_or_redirect
 @check_browser
-def cancel(request, trans_id):
-	if fei_id not in request.session:
-		return HttpResponseRedirect(reverse('Submit'))
-	user_id = request.session[fei_id]
+def cancel(request, trans_id, *args, **kwargs):
+	user = kwargs.get('user')
 	trans = Transaction.objects.get(pk=trans_id)
 	if user_id != trans.user_id:
 		return HttpResponseRedirect(reverse('Submit'))
 	trans.delete()
 	return HttpResponseRedirect(reverse('Submit'))
 
+@get_session_or_redirect
 @check_browser
-def confirm(request, trans_id):
-	if fei_id not in request.session:
-		return HttpResponseRedirect(reverse('Submit'))
-	user_id = request.session[fei_id]
+def confirm(request, trans_id, *args, **kwargs):
+	user = kwargs.get('user')
 	trans = Transaction.objects.get(pk=trans_id)
-	if user_id != trans.user_id:
+	if user.id != trans.user.id:
 		return HttpResponseRedirect(reverse('Submit'))
 	trans.is_confirmed = True
 	trans.save()
 	money = _calc_total(trans.quantity)
 	return render_to_response('liu_yan_ban/payment.html',{'trans_id':trans_id, 'money':money})
+
+@check_auth
+def direct_message(request, user_id):
+	if request.method == 'POST':
+		content = request.POST.get('content')
+		if not content:
+			return HttpResponseRedirect(reverse('DM'))
+		to_user = AUser.objects.get(pk = user_id)
+		dm = DM.objects.create(user=to_user, content=content)
+		return HttpResponseRedirect(reverse('Index'))
+	return render_to_response('liu_yan_ban/direct_message.html')
+
+@check_auth
+def direct_message_all(request):
+	if request.method == 'POST':
+		content = request.POST.get('content')
+		if not content:
+			return HttpResponseRedirect(reverse('DM'))
+		users = AUser.objects.all()
+		for user in users:
+			dm = DM.objects.create(user=user, content=content)
+		return HttpResponseRedirect(reverse('Index'))
+	return render_to_response('liu_yan_ban/direct_message.html')
+
 
 def error(request):
 	return HttpResponseRedirect(reverse('Submit'))

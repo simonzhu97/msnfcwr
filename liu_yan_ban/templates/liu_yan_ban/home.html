@@ -12,7 +12,7 @@
     <div class="arrow"></div>
     <div class="popover-content">
     	<div style='color:#3e2500;font-size:25px;'>
-	      {{comment.content}} -by {{comment.author}}
+	      {{comment.content}} -by {{comment.user}}
 	      <a href='/top/{{comment.id}}/1/' style='color:#b7386c;'><span class='glyphicon glyphicon-heart' aria-hidden='true'></span></a>
 	    </div>
     </div>
@@ -50,7 +50,7 @@
       	{% else %}
       		<div style='color:#3e2500;font-size:18px;'>
       	{% endif %}
-			{{comment.content}} -by {{comment.author}}
+			{{comment.content}} -by {{comment.user}}
 			<a href='/top/{{comment.id}}/1/' style='color:#b7386c;'><span class='glyphicon glyphicon-heart-empty' aria-hidden='true'></span></a>
 		</div>
     </div>

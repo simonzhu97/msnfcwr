@@ -2,18 +2,22 @@
 from django.db import models
 import datetime
 # Create your models here.
+class AUser(models.Model):
+	name = models.CharField(default="匿名",max_length=10)
+	def __unicode__(self):
+		return self.name
+
 class Comment(models.Model):
 	content = models.CharField(max_length = 1000)
-	author = models.CharField(max_length = 100, default = '匿名')
 	pub_date = models.DateTimeField(default = datetime.datetime.now)
 	is_sensored = models.BooleanField(default = False)
 	is_top = models.BooleanField(default = False)
 	is_handled = models.BooleanField(default = False)
-	user_id = models.IntegerField(default= -1)
+	user = models.ForeignKey(AUser)
 	is_viewed = models.BooleanField(default=False)
 
 	def __unicode__(self):
-		return "["+self.author+"]"+self.content
+		return "["+self.user+"]"+self.content
 
 	def short(self):
 		content = self.content
@@ -22,10 +26,6 @@ class Comment(models.Model):
 		else:
 			return content[:10]
 
-class UserID(models.Model):
-	name = models.CharField(default="z",max_length=10)
-	def __unicode__(self):
-		return "User"+str(self.id)
 
 class Transaction(models.Model):
 	name = models.CharField(max_length=100)
@@ -35,7 +35,7 @@ class Transaction(models.Model):
 	shown_name = models.CharField(max_length=100)
 	liuyan = models.CharField(max_length=1000)
 	is_self = models.BooleanField(default=False)
-	user_id = models.IntegerField()
+	user = models.ForeignKey(AUser)
 	is_confirmed = models.BooleanField(default=False)
 	recipient = models.CharField(max_length=100, default="")
 	is_processed = models.BooleanField(default=False)
@@ -43,3 +43,11 @@ class Transaction(models.Model):
 
 	def __unicode__(self):
 		return str(self.id) + ": " + self.name+" bought " + str(self.quantity) + " roses for $"+str(self.money)
+
+class DM(models.Model):
+	user = models.ForeignKey(AUser)
+	content = models.CharField(max_length=200)
+	is_viewed = models.BooleanField(default=False)
+
+	# def __unicode__(self):
+	# 	return "To " + str(self.user)

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 style="color:white;text-align:center;">Direct Message</h1>
+<form method="post" action="">
+	<div class="form-group">
+	    <label for="content" style="color:#004991;">内容</label>
+	    <textarea type="text" class="form-control" name="content" required></textarea>
+	</div>
+	<button type="submit" class="btn btn-primary" >发送 <span class="glyphicon glyphicon-send" style="color:white;" aria-hidden="true"></span></button> 
+</form>
+<style type="text/css">
+	body {
+		background-color: #82c1ed;
+	}
+</style>
+{% endblock %}

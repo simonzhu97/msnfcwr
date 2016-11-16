@@ -14,10 +14,17 @@
   </p>
 {% endfor %}
 
+{% if dms %}
+  <h4>From管理员</h4>
+  {% for dm in dms %}
+    <h5>{{dm.content}}</h5>
+  {% endfor %}
+{% endif %}
+
 <form action='/submit/' method="post" role="form" id="commentform">
 <div class="form-group">
     <label for="name" style="color:#004991;">显示名</label>
-    <input type="text" class="form-control" placeholder = "匿名" name="name">
+    <input type="text" class="form-control" value = "{{user.name}}" name="name">
 </div>
 <div class="form-group">
     <label for="content" style="color:#004991;">内容</label>

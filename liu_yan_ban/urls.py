@@ -22,7 +22,7 @@ urlpatterns = patterns('',
     url(r'^flower/submit/msn/$', views.flower_msn_submit, name='FlowerSubmitMSN'),
     url(r'^transaction/cancel/(?P<trans_id>\d+)/$', views.cancel, name='Cancel'),
     url(r'^transaction/confirm/(?P<trans_id>\d+)/$', views.confirm, name='Confirm'),
+    url(r'^dm/(?P<user_id>\d+)/$', views.direct_message, name='DM'),
+    url(r'^dm/$', views.direct_message_all, name='DMAll'),
     url(r'^', views.error, name='Error'),
-    url(r'^transaction/confirm/(?P<trans_id>\d+)/$', views.confirm, name='Confirm'),
-
 )
