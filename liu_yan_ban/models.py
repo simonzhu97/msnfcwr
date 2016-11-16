@@ -4,7 +4,7 @@ import datetime
 # Create your models here.
 class Comment(models.Model):
 	content = models.CharField(max_length = 1000)
-	author = models.CharField(max_length = 100, default = 'Anonymous')
+	author = models.CharField(max_length = 100, default = '匿名')
 	pub_date = models.DateTimeField(default = datetime.datetime.now)
 	is_sensored = models.BooleanField(default = False)
 	is_top = models.BooleanField(default = False)

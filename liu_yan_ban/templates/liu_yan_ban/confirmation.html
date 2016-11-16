@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 style="color:white;text-align:center;">非诚勿扰鲜花Booth<span class="glyphicon glyphicon-leaf" arid-hidden="true"></span></h1>
-<h3 style="color:white;text-align:center;">以下是你此次Order的详细信息</h3>
+<h3 style="color:white;text-align:center;">以下是你此次订单的详细信息</h3>
 <div style="color:white;text-align:center">
 	<p>名字: {{trans.name}}</p>
 	{% if trans.recipient %}
@@ -18,10 +18,12 @@
 	{% endif %}
 	<p>数量: {{trans.quantity}} 朵</p>
 	<p style="font-size:20px;">总金额: ${{trans.money}}</p>
+	<h3>请仔细确认订单详情，确认后将无法修改</h3>
 	<p>
 	<a href="/transaction/confirm/{{trans.id}}/" class="btn btn-success">确认</a>
 	<a href="/transaction/cancel/{{trans.id}}/" class="btn btn-danger">取消</a>
 	</p>
+
 </div>
 <style type="text/css">
 	body {

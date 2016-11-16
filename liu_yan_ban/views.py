@@ -5,79 +5,97 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from liu_yan_ban.models import Comment, UserID, Transaction
 from django.http import HttpResponse, HttpResponseRedirect, Http404
+import random
 
-fei_id = 'ff_id'
+fei_id = 'msnfcwr_id'
+page_max = 30
 price = {0:0,1:3,3:8,7:16,9:20}
 # Create your views here.
-def index(request):
-	if request.user.is_authenticated():
-		comments = Comment.objects.filter(is_handled = False).order_by('-pub_date')
-		return render_to_response('liu_yan_ban/index.html',{'comments':comments})
-		# if request.user.username == 'zeizyy':
-		# 	comments = Comment.objects.filter(is_handled = False).order_by('-pub_date')
-		# 	return render_to_response('liu_yan_ban/index.html',{'comments':comments})
-		# else:
-		# 	return HttpResponseRedirect(reverse('Delivery'))
-	else:
-		# return HttpResponse(request.META['HTTP_USER_AGENT'])
+
+def check_auth(f):
+	def wrap(request, *args, **kwargs):
+		if not request.user.is_authenticated():
+			# current_url = request.get_full_path()
+			# current_url = quote(current_url, safe='')
+			return HttpResponseRedirect(reverse('Submit'))
+		return f(request, *args, **kwargs)
+	wrap.__doc__=f.__doc__
+	wrap.__name__=f.__name__
+	return wrap
+
+def check_browser(f):
+	def wrap(request, *args, **kwargs):
 		if 'MicroMessenger' in request.META['HTTP_USER_AGENT']:
 			return render_to_response('liu_yan_ban/weixin.html')
+		return f(request, *args, **kwargs)
+	wrap.__doc__=f.__doc__
+	wrap.__name__=f.__name__
+	return wrap
+
+def check_session(f):
+	def wrap(request, *args, **kwargs):
+		if fei_id not in request.session:
+			user = UserID()
+			user.save()
+			user_id = user.id
+			request.session[fei_id] = user_id
 		else:
-			return HttpResponseRedirect(reverse('Submit'))
-		# return render_to_response('liu_yan_ban/weixin.html')
+			user_id = request.session[fei_id]
+		kwargs['user_id'] = user_id
+		return f(request, *args, **kwargs)
+	wrap.__doc__=f.__doc__
+	wrap.__name__=f.__name__
+	return wrap
 
+@check_auth
+@check_browser
+def index(request):
+	comments = Comment.objects.filter(is_handled = False).order_by('pub_date')
+	return render_to_response('liu_yan_ban/index.html',{'comments':comments})
+
+@check_auth
 def home(request):
-	if request.user.is_authenticated():
-		comments = Comment.objects.filter(is_sensored = True).order_by('-pub_date')
-		count_all = len(comments)
-		comments_top = comments.filter(is_top = True)
-		comments = comments.filter(is_top=False)
-		count_top = len(comments_top)
-		count = max(0,min(count_all,24)-count_top)
-		# return HttpResponse(count)
-		# count = (count+1)//2
-		comments_left = comments[:count]
-		# count2 = count*2
-		# comments_right = comments[count:count2]
-		return render_to_response('liu_yan_ban/home.html',{'comments_left':comments_left, 'comments_top':comments_top})
-	else:
-		return HttpResponseRedirect(reverse('Submit'))
+	comments = Comment.objects.filter(is_sensored = True).order_by('-pub_date')
+	count_all = comments.count()
+	comments_top = comments.filter(is_top = True)
+	comments = comments.filter(is_top=False)
+	count_top = len(comments_top)
+	count = max(0, min(count_all, page_max) - count_top)
+	comments_no_top = list(enumerate(comments[:count]))
+	random.shuffle(comments_no_top, random.seed(37))
+	return render_to_response('liu_yan_ban/home.html',{'comments_no_top':comments_no_top, 'comments_top':comments_top})
 
+@check_auth
 def show(request, comment_id):
-	if request.user.is_authenticated():
-		comment = Comment.objects.get(pk=comment_id)
-		comment.is_handled = True
-		comment.is_sensored = True
-		comment.save()
-		return HttpResponseRedirect(reverse('Index'))
-	else:
-		return HttpResponseRedirect(reverse('Submit'))
+	comment = Comment.objects.get(pk=comment_id)
+	# messages.success(request, "comment.short")
+	comment.is_handled = True
+	comment.is_sensored = True
+	comment.save()
+	return HttpResponseRedirect(reverse('Index'))
 
+@check_auth
 def dismiss(request, comment_id):
-	if request.user.is_authenticated():
-		comment = Comment.objects.get(pk=comment_id)
-		comment.is_handled = True
-		comment.is_sensored = False
-		comment.save()
-		return HttpResponseRedirect(reverse('Index'))
-	else:
-		return HttpResponseRedirect(reverse('Submit'))
+	comment = Comment.objects.get(pk=comment_id)
+	# messages.error(request, comment.short)
+	comment.is_handled = True
+	comment.is_sensored = False
+	comment.save()
+	return HttpResponseRedirect(reverse('Index'))
 
-def submit(request):
-	if fei_id not in request.session:
-		user = UserID()
-		user.save()
-		user_id = user.id
-		request.session[fei_id] = user_id
-	else:
-		user_id = request.session[fei_id]
+@check_session
+@check_browser
+def submit(request, *args, **kwargs):
+	user_id = kwargs.get('user_id')
 	error=''
 	success =''
 	comments_handled = Comment.objects.filter(user_id=user_id).filter(is_handled=True).filter(is_viewed=False)
-	comments_approved = comments_handled.filter(is_sensored=True)
-	comments_dismissed = comments_handled.filter(is_sensored=False)
+	comments_approved = list(comments_handled.filter(is_sensored=True))
+	comments_rejected = list(comments_handled.filter(is_sensored=False))
 	transaction_confirmed = Transaction.objects.filter(user_id=user_id).filter(is_confirmed=True).filter(is_delivered=False)
-
+	for comment in comments_handled:
+		comment.is_viewed = True
+		comment.save()
 	if request.method == "POST":
 		name = request.POST["name"]
 		content = request.POST["content"]
@@ -98,29 +116,29 @@ def submit(request):
 				comment.save()
 				return HttpResponseRedirect(reverse('Show',args=[comment.id]))
 			return HttpResponseRedirect(reverse('Success'))
-			# success = '发言成功，请等待管理员审核.现在可继续发表评论.'
 	return render_to_response('liu_yan_ban/submit.html',{
-		'approved':comments_approved, \
-		'dismissed':comments_dismissed, 'error':error, \
-		'success':success,'user_id':user_id,
+		'comments_approved': comments_approved, \
+		'comments_rejected' :comments_rejected, \
+		'error':error, \
+		'success':success, \
+		'user_id':user_id,
 		'trans':transaction_confirmed})
 
+@check_browser
 def success(request):
 	return render_to_response('liu_yan_ban/success.html')
 
+@check_auth
 def top(request, comment_id, option):
-	if request.user.is_authenticated():
-		comment = Comment.objects.get(pk=comment_id)
-		comment.is_top = not comment.is_top
-		comment.is_handled = True
-		comment.is_sensored = True
-		comment.save()
-		if int(option) == 1:
-			return HttpResponseRedirect(reverse('Home'))
-		else:
-			return HttpResponseRedirect(reverse('Index'))
+	comment = Comment.objects.get(pk=comment_id)
+	comment.is_top = not comment.is_top
+	comment.is_handled = True
+	comment.is_sensored = True
+	comment.save()
+	if int(option) == 1:
+		return HttpResponseRedirect(reverse('Home'))
 	else:
-		return HttpResponseRedirect(reverse('Submit'))
+		return HttpResponseRedirect(reverse('Index'))
 
 def view(request):
 	if fei_id not in request.session:
@@ -132,35 +150,21 @@ def view(request):
 		comment.save()
 	return HttpResponseRedirect(reverse('Submit'))
 
-def flower_self(request):
-	if fei_id not in request.session:
-		user = UserID()
-		user.save()
-		user_id = user.id
-		request.session[fei_id] = user_id
-	else:
-		user_id = request.session[fei_id]
+@check_session
+@check_browser
+def flower_self(request, *args, **kwargs):
 	return render_to_response('liu_yan_ban/flower_self.html')
 
-def flower_msn(request):
-	if fei_id not in request.session:
-		user = UserID()
-		user.save()
-		user_id = user.id
-		request.session[fei_id] = user_id
-	else:
-		user_id = request.session[fei_id]
+@check_session
+@check_browser
+def flower_msn(request, *args, **kwargs):
 	return render_to_response('liu_yan_ban/flower_msn.html')
 
-def flower_self_submit(request):
-	if fei_id not in request.session:
-		user = UserID()
-		user.save()
-		user_id = user.id
-		request.session[fei_id] = user_id
-	else:
-		user_id = request.session[fei_id]
-	error = '缺少必填字段!'
+@check_session
+@check_browser
+def flower_self_submit(request, *args, **kwargs):
+	user_id = kwargs.get('user_id')
+	error = '缺少必填部分!'
 	if request.method != 'POST':
 		return HttpResponseRedirect(reverse('FlowerSelf'))
 	if not request.POST['name'] or \
@@ -175,15 +179,11 @@ def flower_self_submit(request):
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
 
-def flower_msn_submit(request):
-	if fei_id not in request.session:
-		user = UserID()
-		user.save()
-		user_id = user.id
-		request.session[fei_id] = user_id
-	else:
-		user_id = request.session[fei_id]
-	error = '缺少必填字段!'
+@check_session
+@check_browser
+def flower_msn_submit(request, *args, **kwargs):
+	user_id = kwargs.get('user_id')
+	error = '缺少必填部分!'
 	if request.method != 'POST':
 		return HttpResponseRedirect(reverse('FlowerMSN'))
 	if not request.POST['name'] or \
@@ -203,6 +203,7 @@ def flower_msn_submit(request):
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
 
+@check_browser
 def confirmation(request, trans_id):
 	if fei_id not in request.session:
 		return HttpResponseRedirect(reverse('Submit'))
@@ -212,17 +213,15 @@ def confirmation(request, trans_id):
 		return HttpResponseRedirect(reverse('Submit'))
 	return render_to_response('liu_yan_ban/confirmation.html',{'trans':trans})
 
+@check_auth
 def process(request,trans_id):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect(reverse('Submit'))
 	trans = Transaction.objects.get(pk=trans_id)
 	trans.is_processed=True
 	trans.save()
 	return HttpResponseRedirect(reverse('Delivery'))
 
+@check_auth
 def delivery(request):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect(reverse('Submit'))
 	transaction = Transaction.objects.filter(is_confirmed=True)
 	transaction_delivered = transaction.filter(is_delivered=True)
 	transaction_processed = transaction.filter(is_processed=True, is_delivered=False)
@@ -232,14 +231,14 @@ def delivery(request):
 		'delivered':transaction_delivered, \
 		'new':transaction_new})
 
+@check_auth
 def handle(request, trans_id):
-	if not request.user.is_authenticated():
-		return HttpResponseRedirect(reverse('Submit'))
 	trans = Transaction.objects.get(pk=trans_id)
 	trans.is_delivered=True
 	trans.save()
 	return HttpResponseRedirect(reverse('Delivery'))
 
+@check_browser
 def cancel(request, trans_id):
 	if fei_id not in request.session:
 		return HttpResponseRedirect(reverse('Submit'))
@@ -250,6 +249,7 @@ def cancel(request, trans_id):
 	trans.delete()
 	return HttpResponseRedirect(reverse('Submit'))
 
+@check_browser
 def confirm(request, trans_id):
 	if fei_id not in request.session:
 		return HttpResponseRedirect(reverse('Submit'))
@@ -259,13 +259,13 @@ def confirm(request, trans_id):
 		return HttpResponseRedirect(reverse('Submit'))
 	trans.is_confirmed = True
 	trans.save()
-	money = calc_total(trans.quantity)
+	money = _calc_total(trans.quantity)
 	return render_to_response('liu_yan_ban/payment.html',{'trans_id':trans_id, 'money':money})
 
 def error(request):
 	return HttpResponseRedirect(reverse('Submit'))
 
-def calc_total(quantity):
+def _calc_total(quantity):
 	if quantity not in price:
 		return HttpResponseRedirect(reverse('Submit'))
 	return price[quantity]

@@ -28,24 +28,24 @@
 
 <div class="row">
 <div class="col-md-12">
-{% for comment in comments_left %}
+{% for index, comment in comments_no_top %}
 <div class="popover-example pull-right" style="display:flex;"> <!-- NEW -->
-{% if forloop.counter|divisibleby:4 %}
+{% if index|divisibleby:4 %}
   <div class="popover top">
-{% elif forloop.counter|divisibleby:3 %}
+{% elif index|divisibleby:3 %}
   <div class="popover right" >
-{% elif forloop.counter|divisibleby:2 %}
+{% elif index|divisibleby:2 %}
   <div class="popover left">
 {% else %}
   <div class="popover bottom">
 {% endif %}
     <div class="arrow"></div>
     <div class="popover-content">
-    	{% if forloop.counter == 1 %}
+    	{% if index == 0 %}
       		<div style='color:#3e2500;font-size:30px;'>
-      	{% elif forloop.counter == 2 %}
+      	{% elif index == 1 %}
       		<div style='color:#3e2500;font-size:26px;'>
-      	{% elif forloop.counter == 3 %}
+      	{% elif index == 2 %}
       		<div style='color:#3e2500;font-size:22px;'>
       	{% else %}
       		<div style='color:#3e2500;font-size:18px;'>
@@ -72,9 +72,4 @@
 	  margin: 8px;
 	}
 </style>
-<script type="text/javascript">
-	$(function () {
-	  $('[data-toggle="popover"]').popover('show')
-	})
-</script>
 {% endblock %}

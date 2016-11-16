@@ -31,7 +31,7 @@
 	{% if trans.is_self %}
 	<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#processed-{{trans.id}}">送出</button>
 	{% else %}
-	<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#processed-{{trans.id}}">Schedule</button>
+	<button class="btn btn-xs btn-danger" data-toggle="modal" data-target="#processed-{{trans.id}}">送出</button>
 	{% endif %}
 	<!-- 模态框（Modal） -->
 			<div class="modal fade" id="processed-{{trans.id}}" tabindex="-1" role="dialog" 
@@ -68,7 +68,7 @@
 	{% if trans.is_self %}
 	<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#delivered-{{trans.id}}">送达</button>
 	{% else %}
-	<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#delivered-{{trans.id}}">送出</button>
+	<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#delivered-{{trans.id}}">送达</button>
 	{% endif %}
 
 	<!-- 模态框（Modal） -->

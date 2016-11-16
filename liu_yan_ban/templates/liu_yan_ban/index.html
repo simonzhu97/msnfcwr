@@ -22,8 +22,8 @@
 {% for comment in comments %}
 <p>
 	{{comment.content}} -by {{comment.author}} ({{comment.user_id}})
-	<a href="/show/{{comment.id}}/" class="btn btn-xs btn-primary">Show</a>
-	<a href="/dismiss/{{comment.id}}/" class="btn btn-xs btn-danger">Dismiss</a>
+	<a href="/show/{{comment.id}}/" class="btn btn-xs btn-primary">Approve</a>
+	<a href="/dismiss/{{comment.id}}/" class="btn btn-xs btn-danger">Reject</a>
 	<a href="/top/{{comment.id}}/2/" class="btn btn-xs btn-success">Top</a>
 </p>
 
