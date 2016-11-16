@@ -2,6 +2,12 @@
 {% block content %}
 <h1 style="color:white;text-align:center;">留言板 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span></h1>
 
+{% if error %}
+<p style="color:#990000;text-align:center;">
+  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {{error}}
+</p>
+{% endif %}
+
 {% for message in comments_approved %}
   <p style="color:#009933;">
     <i>{{message.short}}</i> 已通过
