@@ -10,25 +10,25 @@
 
 {% if comments_approved or comments_rejected or dms %}
 <div class="panel panel-info">
-  <div class="panel-heading">Dashboard</div>
+  <div class="panel-heading">新信息</div>
   <div class="panel-body">
     {% if dms %}
       {% for dm in dms %}
         <p style="font-size:18px;">
-          管理员说: <i>{{dm.content}}</i>
+          管理员说: <b>{{dm.content}}</b>
         </p>
       {% endfor %}
     {% endif %}
-    
+
     {% for message in comments_approved %}
       <p style="color:#009933;">
-        <i>{{message.short}}</i> 已通过
+        <b>{{message.short}}</b> 已通过
       </p>
     {% endfor %}
 
     {% for message in comments_rejected %}
       <p style="color:#990000;">
-        <i>{{message.short}}</i> 未能通过
+        <b>{{message.short}}</b> 未能通过
       </p>
     {% endfor %}
   </div>

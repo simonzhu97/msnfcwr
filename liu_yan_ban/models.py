@@ -17,7 +17,7 @@ class Comment(models.Model):
 	is_viewed = models.BooleanField(default=False)
 
 	def __unicode__(self):
-		return "["+self.user+"]"+self.content
+		return "["+self.user.name+"]"+self.content
 
 	def short(self):
 		content = self.content
