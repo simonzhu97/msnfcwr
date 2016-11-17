@@ -8,24 +8,33 @@
 </p>
 {% endif %}
 
-{% for message in comments_approved %}
-  <p style="color:#009933;">
-    <i>{{message.short}}</i> 已通过
-  </p>
-{% endfor %}
+{% if comments_approved or comments_rejected or dms %}
+<div class="panel panel-info">
+  <div class="panel-heading">Dashboard</div>
+  <div class="panel-body">
+    {% if dms %}
+      {% for dm in dms %}
+        <p style="font-size:18px;">
+          管理员说: <i>{{dm.content}}</i>
+        </p>
+      {% endfor %}
+    {% endif %}
+    
+    {% for message in comments_approved %}
+      <p style="color:#009933;">
+        <i>{{message.short}}</i> 已通过
+      </p>
+    {% endfor %}
 
-{% for message in comments_rejected %}
-  <p style="color:#990000;">
-    <i>{{message.short}}</i> 未能通过
-  </p>
-{% endfor %}
-
-{% if dms %}
-  <h4>From管理员</h4>
-  {% for dm in dms %}
-    <h5>{{dm.content}}</h5>
-  {% endfor %}
+    {% for message in comments_rejected %}
+      <p style="color:#990000;">
+        <i>{{message.short}}</i> 未能通过
+      </p>
+    {% endfor %}
+  </div>
+</div>
 {% endif %}
+
 
 <form action='/submit/' method="post" role="form" id="commentform">
 <div class="form-group">
