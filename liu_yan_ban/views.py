@@ -25,7 +25,6 @@ def check_auth(f):
 
 def check_browser(f):
 	def wrap(request, *args, **kwargs):
-		return render_to_response('liu_yan_ban/weixin.html')
 		if 'MicroMessenger' in request.META['HTTP_USER_AGENT']:
 			return render_to_response('liu_yan_ban/weixin.html')
 		return f(request, *args, **kwargs)
