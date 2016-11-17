@@ -188,7 +188,7 @@ def flower_msn(request, *args, **kwargs):
 @check_session
 @check_browser
 def flower_self_submit(request, *args, **kwargs):
-	user_id = kwargs.get('user_id')
+	user = kwargs.get('user')
 	error = '缺少必填部分!'
 	if request.method != 'POST':
 		return HttpResponseRedirect(reverse('FlowerSelf'))
@@ -200,14 +200,14 @@ def flower_self_submit(request, *args, **kwargs):
 	quantity = request.POST['quantity']
 	location = request.POST['location']
 	transaction = Transaction(name=name, quantity=quantity,\
-		location=location,is_self=True, user_id=user_id, money=price[int(quantity)])
+		location=location,is_self=True, user=user, money=price[int(quantity)])
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
 
 @check_session
 @check_browser
 def flower_msn_submit(request, *args, **kwargs):
-	user_id = kwargs.get('user_id')
+	user = kwargs.get('user')
 	error = '缺少必填部分!'
 	if request.method != 'POST':
 		return HttpResponseRedirect(reverse('FlowerMSN'))
@@ -224,7 +224,7 @@ def flower_msn_submit(request, *args, **kwargs):
 		shown_name = request.POST['shown_name']
 	transaction = Transaction(name=name, shown_name=shown_name,\
 				quantity = quantity, recipient=recipient,\
-		is_self=False, user_id=user_id, money = price[int(quantity)])
+		is_self=False, user=user, money = price[int(quantity)])
 	transaction.save()
 	return HttpResponseRedirect(reverse('Confirmation',args=[transaction.id]))
 
@@ -267,7 +267,7 @@ def handle(request, trans_id):
 def cancel(request, trans_id, *args, **kwargs):
 	user = kwargs.get('user')
 	trans = Transaction.objects.get(pk=trans_id)
-	if user_id != trans.user_id:
+	if user.id != trans.user.id:
 		return HttpResponseRedirect(reverse('Submit'))
 	trans.delete()
 	return HttpResponseRedirect(reverse('Submit'))
