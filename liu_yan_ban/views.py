@@ -67,7 +67,7 @@ def check_like_session(f):
 	def wrap(request, *args, **kwargs):
 		if fei_like not in request.session:
 			request.session[fei_like] = []
-		user_likes = map(int, request.session[fei_like])
+		user_likes = request.session[fei_like]
 		kwargs[fei_like] = user_likes
 		return f(request, *args, **kwargs)
 	wrap.__doc__=f.__doc__
@@ -85,9 +85,13 @@ def home(request, *args, **kwargs):
 	is_auth = request.user.is_authenticated()
 	comments_max = Comment.objects.filter(is_sensored = True).order_by('-pub_date')[:page_max]
 	comments_top = [comments for comments in comments_max if comments.is_top or comments.likes >= min_like]
-	comments_no_top = [comments for comments in comments_max if not comments.is_top and not comments.likes >= 4]
+	if is_auth:
+		comments_no_top = [comments for comments in comments_max if not comments.is_top and not comments.likes >= 4]
+	else:
+		comments_no_top = comments_max
 	comments_no_top = list(enumerate(comments_no_top))
-	random.shuffle(comments_no_top, random.seed(37))
+	if is_auth:
+		random.shuffle(comments_no_top, random.seed(37))
 	if not is_auth:
 		user_likes = kwargs[fei_like]
 		comments_no_top = [(index, comment) for index, comment in comments_no_top if comment.id not in user_likes]
