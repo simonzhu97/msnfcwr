@@ -3,11 +3,14 @@ from django.shortcuts import render
 from django.shortcuts import render, render_to_response
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.db.models import Q
 from liu_yan_ban.models import *
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 import random
 
 fei_id = 'msnfcwr_id'
+fei_like = 'msnfcwr_like'
+min_like = 20
 page_max = 30
 price = {0:0,1:3,3:8,7:16,9:20}
 # Create your views here.
@@ -60,23 +63,36 @@ def get_session_or_redirect(f):
 	wrap.__name__=f.__name__
 	return wrap
 
+def check_like_session(f):
+	def wrap(request, *args, **kwargs):
+		if fei_like not in request.session:
+			request.session[fei_like] = []
+		user_likes = map(int, request.session[fei_like])
+		kwargs[fei_like] = user_likes
+		return f(request, *args, **kwargs)
+	wrap.__doc__=f.__doc__
+	wrap.__name__=f.__name__
+	return wrap
+
 @check_auth
 @check_browser
 def index(request):
 	comments = Comment.objects.filter(is_handled = False).order_by('pub_date')
 	return render_to_response('liu_yan_ban/index.html',{'comments':comments})
 
-@check_auth
-def home(request):
-	comments = Comment.objects.filter(is_sensored = True).order_by('-pub_date')
-	count_all = comments.count()
-	comments_top = comments.filter(is_top = True)
-	comments = comments.filter(is_top=False)
-	count_top = len(comments_top)
-	count = max(0, min(count_all, page_max) - count_top)
-	comments_no_top = list(enumerate(comments[:count]))
+@check_like_session
+def home(request, *args, **kwargs):
+	is_auth = request.user.is_authenticated()
+	comments_max = Comment.objects.filter(is_sensored = True).order_by('-pub_date')[:page_max]
+	comments_top = [comments for comments in comments_max if comments.is_top or comments.likes >= min_like]
+	comments_no_top = [comments for comments in comments_max if not comments.is_top and not comments.likes >= 4]
+	comments_no_top = list(enumerate(comments_no_top))
 	random.shuffle(comments_no_top, random.seed(37))
-	return render_to_response('liu_yan_ban/home.html',{'comments_no_top':comments_no_top, 'comments_top':comments_top})
+	if not is_auth:
+		user_likes = kwargs[fei_like]
+		comments_no_top = [(index, comment) for index, comment in comments_no_top if comment.id not in user_likes]
+	return render_to_response('liu_yan_ban/home.html',{'comments_no_top':comments_no_top, 'comments_top':comments_top, 
+							'is_auth':is_auth, 'is_auth_home':is_auth})
 
 @check_auth
 def show(request, comment_id):
@@ -164,6 +180,17 @@ def top(request, comment_id, option):
 		return HttpResponseRedirect(reverse('Home'))
 	else:
 		return HttpResponseRedirect(reverse('Index'))
+
+@check_like_session
+def like(request, comment_id, *args, **kwargs):
+	user_likes = kwargs[fei_like]
+	if comment_id in user_likes:
+		return HttpResponseRedirect(reverse('Submit'))
+	user_likes.append(int(comment_id))
+	request.session[fei_like] = user_likes
+	comment = Comment.objects.get(pk=comment_id)
+	comment.like()
+	return HttpResponseRedirect(reverse('Home'))
 
 def view(request):
 	if fei_id not in request.session:

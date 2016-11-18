@@ -10,6 +10,7 @@ class AUser(models.Model):
 class Comment(models.Model):
 	content = models.CharField(max_length = 1000)
 	pub_date = models.DateTimeField(default = datetime.datetime.now)
+	likes = models.IntegerField(default=0)
 	is_sensored = models.BooleanField(default = False)
 	is_top = models.BooleanField(default = False)
 	is_handled = models.BooleanField(default = False)
@@ -18,6 +19,10 @@ class Comment(models.Model):
 
 	def __unicode__(self):
 		return "["+self.user.name+"]"+self.content
+
+	def like(self):
+		self.likes += 1
+		self.save()
 
 	def short(self):
 		content = self.content
