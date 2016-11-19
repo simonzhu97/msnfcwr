@@ -82,6 +82,7 @@ def index(request):
 	return render_to_response('liu_yan_ban/index.html',{'comments':comments})
 
 @check_like_session
+@get_session_or_redirect
 def home(request, *args, **kwargs):
 	is_auth = request.user.is_authenticated()
 	comments_max = Comment.objects.filter(is_sensored = True).order_by('-pub_date')[:page_max]
