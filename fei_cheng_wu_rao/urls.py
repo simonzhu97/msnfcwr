@@ -6,6 +6,6 @@ urlpatterns = patterns('',
     # url(r'^$', 'fei_cheng_wu_rao.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^angel/', include(admin.site.urls)),
     url(r'^', include('liu_yan_ban.urls')),
 )
