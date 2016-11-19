@@ -18,7 +18,7 @@
 	{% endif %}
 	<p>数量: {{trans.quantity}} 朵</p>
 	<p style="font-size:20px;">总金额: ${{trans.money}}</p>
-	<h3>请仔细确认订单详情，确认后将无法修改</h3>
+	<h3>**请仔细确认订单详情，确认后将无法修改**</h3>
 	<p>
 	<a href="/transaction/confirm/{{trans.id}}/" class="btn btn-success">确认</a>
 	<a href="/transaction/cancel/{{trans.id}}/" class="btn btn-danger">取消</a>

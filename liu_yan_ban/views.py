@@ -10,8 +10,9 @@ import random
 
 fei_id = 'msnfcwr_id'
 fei_like = 'msnfcwr_like'
-min_like = 20
+min_like = 40
 page_max = 30
+like_max = 15
 price = {0:0,1:3,3:8,7:16,9:20}
 # Create your views here.
 
@@ -88,7 +89,7 @@ def home(request, *args, **kwargs):
 	if is_auth:
 		comments_no_top = [comments for comments in comments_max if not comments.is_top and not comments.likes >= 4]
 	else:
-		comments_no_top = comments_max
+		comments_no_top = comments_max[:like_max]
 	comments_no_top = list(enumerate(comments_no_top))
 	if is_auth:
 		random.shuffle(comments_no_top, random.seed(37))
@@ -191,9 +192,20 @@ def like(request, comment_id, *args, **kwargs):
 	if comment_id in user_likes:
 		return HttpResponseRedirect(reverse('Submit'))
 	user_likes.append(int(comment_id))
-	request.session[fei_like] = user_likes
+	request.session[fei_like] = user_likes[-page_max:]
 	comment = Comment.objects.get(pk=comment_id)
 	comment.like()
+	return HttpResponseRedirect(reverse('Home'))
+
+@check_like_session
+def dislike(request, comment_id, *args, **kwargs):
+	user_likes = kwargs[fei_like]
+	if comment_id in user_likes:
+		return HttpResponseRedirect(reverse('Submit'))
+	user_likes.append(int(comment_id))
+	request.session[fei_like] = user_likes[-page_max:]
+	comment = Comment.objects.get(pk=comment_id)
+	comment.dislike()
 	return HttpResponseRedirect(reverse('Home'))
 
 def view(request):
@@ -317,14 +329,14 @@ def confirm(request, trans_id, *args, **kwargs):
 
 @check_auth
 def direct_message(request, user_id):
+	to_user = AUser.objects.get(pk = user_id)
 	if request.method == 'POST':
 		content = request.POST.get('content')
 		if not content:
 			return HttpResponseRedirect(reverse('DM'))
-		to_user = AUser.objects.get(pk = user_id)
 		dm = DM.objects.create(user=to_user, content=content)
-		return HttpResponseRedirect(reverse('Index'))
-	return render_to_response('liu_yan_ban/direct_message.html')
+		return HttpResponseRedirect(reverse('Success'))
+	return render_to_response('liu_yan_ban/direct_message.html', {'user': to_user})
 
 @check_auth
 def direct_message_all(request):

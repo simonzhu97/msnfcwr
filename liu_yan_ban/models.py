@@ -24,6 +24,10 @@ class Comment(models.Model):
 		self.likes += 1
 		self.save()
 
+	def dislike(self):
+		self.likes -= 1
+		self.save()
+
 	def short(self):
 		content = self.content
 		if len(content)>10:

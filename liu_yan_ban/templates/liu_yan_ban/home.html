@@ -65,6 +65,7 @@
 			 <a href='/top/{{comment.id}}/1/' style='color:#b7386c;'><span class='glyphicon glyphicon-heart-empty' aria-hidden='true'></span></a>*{{comment.likes}}
       {% else %}
         <a href='/like/{{comment.id}}/' style='color:#b7386c;'><span class='glyphicon glyphicon-thumbs-up' aria-hidden='true'></span></a>
+        <a href='/dislike/{{comment.id}}/' style='color:#b7386c;'><span class='glyphicon glyphicon-thumbs-down' aria-hidden='true'></span></a>
       {% endif %}
 		</div>
     </div>
