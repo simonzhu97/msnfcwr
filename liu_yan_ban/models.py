@@ -3,7 +3,7 @@ from django.db import models
 import datetime
 # Create your models here.
 class AUser(models.Model):
-	name = models.CharField(default="匿名",max_length=1000)
+	name = models.CharField(default="匿名",max_length=100)
 	def __unicode__(self):
 		return self.name
 
