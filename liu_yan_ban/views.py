@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.db.models import Q
 from liu_yan_ban.models import *
+from liu_yan_ban.forms import *
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 import random
 
@@ -359,3 +360,6 @@ def _calc_total(quantity):
 	if quantity not in price:
 		return HttpResponseRedirect(reverse('Submit'))
 	return price[quantity]
+
+def catch_error():
+	return render_to_response('liu_yan_ban/error.html')

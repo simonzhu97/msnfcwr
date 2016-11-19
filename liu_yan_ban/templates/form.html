@@ -1,0 +1,38 @@
+<div class="form-group">
+{% for field in form %}
+    {% if field.is_hidden == False %}
+
+        {% if not field.name == 'honorcode'%}
+            {{ field.label_tag }}
+        {% endif %}
+        <small class="text-muted"> {{ field.help_text }} </small>
+		{% if field.name == 'price' or field.name == 'bidding_price' %}
+			<div class="input-group">
+		       	<div class="input-group-addon">$</div>
+		        {{ field }}
+		    </div>
+		{% elif field.name == 'bidding_duration' %}
+			<div class="input-group">
+		        {{ field }}
+		        <div class="input-group-addon">days</div>
+		    </div>
+		{% elif field.name == 'mileage' %}
+			<div class="input-group">
+		        {{ field }}
+		        <div class="input-group-addon">miles</div>
+		    </div>
+        {% elif field.name == 'honorcode' %}
+            <div class="checkbox">
+              <label><input checked="checked" id="id_honorcode" name="honorcode" type="checkbox">On my honor as a UVa student, I pledge that I will fulfill the responsibilities
+                  both as a buyer and as a seller.
+              </label>
+            </div>
+		{% else %}
+		    {{ field }}
+	    {% endif %}
+        {{ field.errors }}
+    {% else %}
+    	{{ field }}
+    {% endif %} 
+{% endfor %}
+</div>
